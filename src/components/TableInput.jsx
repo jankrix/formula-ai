@@ -1,7 +1,26 @@
 import { useState, useCallback } from "react";
 
+function buildColspanCells(row) {
+  const result = [];
+  let i = 0;
+  while (i < row.length) {
+    const val = row[i];
+    if (val) {
+      let span = 1;
+      while (i + span < row.length && row[i + span] === "") span++;
+      result.push({ value: val, colspan: span });
+      i += span;
+    } else {
+      result.push({ value: "", colspan: 1 });
+      i++;
+    }
+  }
+  return result;
+}
+
 export default function TableInput({ onChange }) {
   const [cells, setCells] = useState([]);
+  const [origLengths, setOrigLengths] = useState([]);
   const [hasData, setHasData] = useState(false);
   const [pasteError, setPasteError] = useState("");
   const [headerRows, setHeaderRows] = useState(1);
@@ -19,6 +38,9 @@ export default function TableInput({ onChange }) {
     setPasteError("");
     const rows = lines.map((r) => r.split("\t"));
     const maxCols = Math.max(...rows.map((r) => r.length));
+
+    setOrigLengths(rows.map((r) => r.length));
+
     const padded = rows.map((r) => {
       const copy = [...r];
       while (copy.length < maxCols) copy.push("");
@@ -32,6 +54,7 @@ export default function TableInput({ onChange }) {
 
   const handleClear = () => {
     setCells([]);
+    setOrigLengths([]);
     setHasData(false);
     setPasteError("");
     setHeaderRows(1);
@@ -53,9 +76,19 @@ export default function TableInput({ onChange }) {
     );
   }
 
+  const colCount = cells[0].length;
+
+  // for each header row, right-shift if its original length was less than maxCols
+  // (caused by merged empty cells that Google Sheets compresses to 1 tab)
+  function getDisplayRow(row, rowIndex) {
+    const deficit = colCount - (origLengths[rowIndex] ?? colCount);
+    if (deficit <= 0) return row;
+    const shifted = [...Array(deficit).fill(""), ...row.slice(0, colCount - deficit)];
+    return shifted;
+  }
+
   const headRows = cells.slice(0, headerRows);
   const bodyRows = cells.slice(headerRows);
-  const colCount = cells[0].length;
 
   return (
     <div className="section">
@@ -64,14 +97,8 @@ export default function TableInput({ onChange }) {
         <div className="table-controls">
           <div className="header-row-toggle">
             <span className="toggle-label">Header rows:</span>
-            <button
-              className={headerRows === 1 ? "active" : ""}
-              onClick={() => setHeaderRows(1)}
-            >1</button>
-            <button
-              className={headerRows === 2 ? "active" : ""}
-              onClick={() => setHeaderRows(2)}
-            >2</button>
+            <button className={headerRows === 1 ? "active" : ""} onClick={() => setHeaderRows(1)}>1</button>
+            <button className={headerRows === 2 ? "active" : ""} onClick={() => setHeaderRows(2)}>2</button>
           </div>
           <button className="clear-btn" onClick={handleClear}>Clear &amp; re-paste</button>
         </div>
@@ -79,14 +106,26 @@ export default function TableInput({ onChange }) {
       <div className="table-preview-wrapper" onPaste={handlePaste}>
         <table className="table-preview">
           <thead>
-            {headRows.map((row, ri) => (
-              <tr key={ri}>
-                <th className="row-num"></th>
-                {Array.from({ length: colCount }, (_, ci) => (
-                  <th key={ci}>{row[ci] ?? ""}</th>
-                ))}
-              </tr>
-            ))}
+            {headRows.map((row, ri) => {
+              const displayRow = getDisplayRow(row, ri);
+              const cellDefs = headerRows === 2 && ri === 0
+                ? buildColspanCells(displayRow)
+                : displayRow.map((v) => ({ value: v, colspan: 1 }));
+              return (
+                <tr key={ri}>
+                  <th className="row-num"></th>
+                  {cellDefs.map((cell, ci) => (
+                    <th
+                      key={ci}
+                      colSpan={cell.colspan}
+                      style={{ textAlign: cell.colspan > 1 ? "center" : "left" }}
+                    >
+                      {cell.value}
+                    </th>
+                  ))}
+                </tr>
+              );
+            })}
           </thead>
           <tbody>
             {bodyRows.map((row, ri) => (
