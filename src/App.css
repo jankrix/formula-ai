@@ -195,57 +195,84 @@ footer {
   color: #999;
 }
 
+.table-input-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.table-input-layout textarea {
+  height: 200px;
+  resize: none;
+}
+
+.table-empty-state {
+  height: 200px;
+  border: 1.5px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  font-size: 0.85rem;
+  background: #fafafa;
+}
+
 .table-preview-wrapper {
-  overflow-x: auto;
+  overflow: auto;
   border: 1.5px solid #ddd;
   border-radius: 8px;
   background: #fff;
+  height: 200px;
 }
 
 .table-preview {
-  width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-family: monospace;
+  min-width: 100%;
 }
 
 .table-preview thead tr {
   background: #f0f4ff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table-preview th {
   text-align: left;
-  padding: 8px 12px;
+  padding: 7px 10px;
   font-weight: 600;
   color: #1a73e8;
-  border-bottom: 1.5px solid #ddd;
+  border: 1px solid #d0d7e8;
   white-space: nowrap;
 }
 
 .table-preview td {
-  padding: 7px 12px;
+  padding: 6px 10px;
   color: #333;
-  border-bottom: 1px solid #f0f0f0;
+  border: 1px solid #e8e8e8;
   white-space: nowrap;
 }
 
-.table-preview tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.table-preview tbody tr:hover {
-  background: #fafafa;
+.table-preview tbody tr:hover td {
+  background: #f5f8ff;
 }
 
 .row-num {
   color: #bbb !important;
   font-size: 0.75rem;
   font-weight: 400 !important;
-  width: 32px;
+  width: 28px;
+  min-width: 28px;
   text-align: center !important;
   user-select: none;
+  background: #fafafa !important;
+  border-color: #e0e0e0 !important;
 }
 
-.empty-cell {
-  color: #ccc;
+.table-preview thead .row-num {
+  background: #f0f4ff !important;
 }
