@@ -57,6 +57,25 @@ export default function TableInput({ onChange }) {
   const bodyRows = cells.slice(headerRows);
   const colCount = cells[0].length;
 
+  // group consecutive empty cells after a non-empty cell into colspan
+  function buildHeaderCells(row) {
+    const result = [];
+    let i = 0;
+    while (i < row.length) {
+      const val = row[i];
+      if (val) {
+        let span = 1;
+        while (i + span < row.length && row[i + span] === "") span++;
+        result.push({ value: val, colspan: span });
+        i += span;
+      } else {
+        result.push({ value: "", colspan: 1 });
+        i++;
+      }
+    }
+    return result;
+  }
+
   return (
     <div className="section">
       <div className="table-label-row">
@@ -82,8 +101,10 @@ export default function TableInput({ onChange }) {
             {headRows.map((row, ri) => (
               <tr key={ri}>
                 <th className="row-num"></th>
-                {Array.from({ length: colCount }, (_, ci) => (
-                  <th key={ci}>{row[ci] || "—"}</th>
+                {buildHeaderCells(row).map((cell, ci) => (
+                  <th key={ci} colSpan={cell.colspan} style={{ textAlign: cell.colspan > 1 ? "center" : "left" }}>
+                    {cell.value}
+                  </th>
                 ))}
               </tr>
             ))}
