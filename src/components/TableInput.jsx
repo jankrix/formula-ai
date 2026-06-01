@@ -1,22 +1,23 @@
 import { useState, useCallback } from "react";
 
-const EMPTY_ROWS = 6;
-const EMPTY_COLS = 5;
-
-function makeEmpty() {
-  return Array.from({ length: EMPTY_ROWS }, () => Array(EMPTY_COLS).fill(""));
-}
-
 export default function TableInput({ onChange }) {
-  const [cells, setCells] = useState(makeEmpty());
+  const [cells, setCells] = useState([]);
   const [hasData, setHasData] = useState(false);
+  const [pasteError, setPasteError] = useState("");
 
   const handlePaste = useCallback((e) => {
     e.preventDefault();
     const raw = e.clipboardData.getData("text/plain");
-    const rows = raw.trim().split("\n").map((r) => r.split("\t"));
+    const lines = raw.trim().split("\n");
 
-    // pad all rows to same length
+    const hasTabs = raw.includes("\t");
+    if (!hasTabs) {
+      setPasteError("Looks like plain text — please copy directly from Excel or Google Sheets and try again.");
+      return;
+    }
+
+    setPasteError("");
+    const rows = lines.map((r) => r.split("\t"));
     const maxCols = Math.max(...rows.map((r) => r.length));
     const padded = rows.map((r) => {
       const copy = [...r];
@@ -27,14 +28,14 @@ export default function TableInput({ onChange }) {
     setCells(padded);
     setHasData(true);
 
-    // send tab-separated back to parent for AI call
     const tsv = padded.map((r) => r.join("\t")).join("\n");
     onChange(tsv);
   }, [onChange]);
 
   const handleClear = () => {
-    setCells(makeEmpty());
+    setCells([]);
     setHasData(false);
+    setPasteError("");
     onChange("");
   };
 
@@ -55,6 +56,7 @@ export default function TableInput({ onChange }) {
           <div className="paste-zone-text">Click here and paste your table</div>
           <div className="paste-zone-sub">Works with Excel and Google Sheets</div>
         </div>
+        {pasteError && <p className="error" style={{ marginTop: 8 }}>{pasteError}</p>}
       </div>
     );
   }
