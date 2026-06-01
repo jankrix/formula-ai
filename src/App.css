@@ -195,6 +195,66 @@ footer {
   color: #999;
 }
 
+.paste-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 2px dashed #c5d5f5;
+  border-radius: 10px;
+  background: #f8faff;
+  padding: 40px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  outline: none;
+}
+
+.paste-zone:hover,
+.paste-zone:focus {
+  border-color: #1a73e8;
+  background: #f0f4ff;
+}
+
+.paste-zone-icon {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a73e8;
+  font-family: monospace;
+}
+
+.paste-zone-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.paste-zone-sub {
+  font-size: 0.82rem;
+  color: #999;
+}
+
+.table-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clear-btn {
+  font-size: 0.8rem;
+  color: #888;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  color: #d93025;
+  border-color: #d93025;
+}
+
 .table-preview-wrapper {
   overflow: auto;
   border: 1.5px solid #ddd;

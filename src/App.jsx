@@ -50,7 +50,7 @@ export default function App() {
       </header>
 
       <main>
-        <TableInput value={tableData} onChange={setTableData} />
+        <TableInput onChange={setTableData} />
 
         <div className="section">
           <label>Formula type</label>
