@@ -240,6 +240,42 @@ footer {
   justify-content: space-between;
 }
 
+.table-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-row-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toggle-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.header-row-toggle button {
+  width: 28px;
+  height: 24px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.15s;
+}
+
+.header-row-toggle button.active {
+  background: #1a73e8;
+  border-color: #1a73e8;
+  color: #fff;
+  font-weight: 600;
+}
+
 .clear-btn {
   font-size: 0.8rem;
   color: #888;
