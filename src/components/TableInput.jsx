@@ -46,21 +46,13 @@ export default function TableInput({ value, onChange }) {
     <div className="section">
       <label>Paste your table here</label>
       <p className="hint">Copy headers + a few rows from Excel or Google Sheets and paste below.</p>
-      <div className="table-input-layout">
-        <textarea
-          rows={8}
-          placeholder={"Name\tDepartment\tSales\nAlice\tMarketing\t5000\nBob\tSales\t8000"}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        {parsed ? (
-          <TablePreview rows={parsed} />
-        ) : (
-          <div className="table-empty-state">
-            <span>Table preview will appear here</span>
-          </div>
-        )}
-      </div>
+      <textarea
+        rows={5}
+        placeholder={"Name\tDepartment\tSales\nAlice\tMarketing\t5000\nBob\tSales\t8000"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {parsed && <TablePreview rows={parsed} />}
     </div>
   );
 }

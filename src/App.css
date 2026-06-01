@@ -195,36 +195,12 @@ footer {
   color: #999;
 }
 
-.table-input-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: start;
-}
-
-.table-input-layout textarea {
-  height: 200px;
-  resize: none;
-}
-
-.table-empty-state {
-  height: 200px;
-  border: 1.5px dashed #ddd;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #bbb;
-  font-size: 0.85rem;
-  background: #fafafa;
-}
-
 .table-preview-wrapper {
   overflow: auto;
   border: 1.5px solid #ddd;
   border-radius: 8px;
   background: #fff;
-  height: 200px;
+  max-height: 240px;
 }
 
 .table-preview {
