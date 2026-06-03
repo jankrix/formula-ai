@@ -1,7 +1,9 @@
 import { useState } from "react";
+import FeedbackModal from "./FeedbackModal";
 
 export default function FormulaOutput({ result }) {
   const [copied, setCopied] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   if (!result) return null;
 
@@ -15,17 +17,22 @@ export default function FormulaOutput({ result }) {
     navigator.clipboard.writeText(formula);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setShowFeedback(true), 400);
   };
 
   return (
-    <div className="output">
-      <div className="formula-box">
-        <code>{formula}</code>
-        <button className="copy-btn" onClick={handleCopy}>
-          {copied ? "Copied!" : "Copy"}
-        </button>
+    <>
+      <div className="output">
+        <div className="formula-box">
+          <code>{formula}</code>
+          <button className="copy-btn" onClick={handleCopy}>
+            {copied ? "Copied!" : "Copy"}
+          </button>
+        </div>
+        {explanation && <p className="explanation">{explanation}</p>}
       </div>
-      {explanation && <p className="explanation">{explanation}</p>}
-    </div>
+
+      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+    </>
   );
 }
