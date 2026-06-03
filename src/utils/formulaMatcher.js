@@ -31,6 +31,24 @@ function extractValue(q) {
   return m ? m[1].trim() : null;
 }
 
+function getColValues(grid, colIndex, headerRows) {
+  return grid
+    .slice(headerRows)
+    .map((row) => (row[colIndex] ?? "").trim())
+    .filter(Boolean);
+}
+
+function validateValue(val, grid, colIndex, headerRows) {
+  if (!val) return null;
+  const values = getColValues(grid, colIndex, headerRows);
+  const exists = values.some((v) => v.toLowerCase() === val.toLowerCase());
+  if (!exists && values.length > 0) {
+    const unique = [...new Set(values)].slice(0, 5).join(", ");
+    return `"${val}" was not found in that column. Available values: ${unique}${values.length > 5 ? "…" : ""}`;
+  }
+  return null;
+}
+
 function condKeyPos(q) {
   const positions = COND_KW.map((k) => q.indexOf(k)).filter((p) => p >= 0);
   return positions.length ? Math.min(...positions) : Infinity;
@@ -64,9 +82,11 @@ export function matchFormula(query, grid, headerRows) {
     const condCol = cols.find((c) => c !== sumCol) || cols[1];
     const val = extractValue(q);
     const criteria = val ? `"${val}"` : `""`;
+    const warning = validateValue(val, grid, condCol.index, headerRows);
     return {
       formula: `=SUMIF(${fc(condCol.letter)},${criteria},${fc(sumCol.letter)})`,
       explanation: `Sums ${sumCol.name} where ${condCol.name} equals ${val || "the specified value"}.`,
+      warning,
     };
   }
 
@@ -84,9 +104,11 @@ export function matchFormula(query, grid, headerRows) {
     const condCol = cols.find((c) => c.pos > ckp) || cols[0];
     const val = extractValue(q);
     const criteria = val ? `"${val}"` : `""`;
+    const warning = validateValue(val, grid, condCol.index, headerRows);
     return {
       formula: `=COUNTIF(${fc(condCol.letter)},${criteria})`,
       explanation: `Counts rows where ${condCol.name} equals ${val || "the specified value"}.`,
+      warning,
     };
   }
 
@@ -105,9 +127,11 @@ export function matchFormula(query, grid, headerRows) {
     const condCol = cols.find((c) => c !== avgCol) || cols[1];
     const val = extractValue(q);
     const criteria = val ? `"${val}"` : `""`;
+    const warning = validateValue(val, grid, condCol.index, headerRows);
     return {
       formula: `=AVERAGEIF(${fc(condCol.letter)},${criteria},${fc(avgCol.letter)})`,
       explanation: `Averages ${avgCol.name} where ${condCol.name} equals ${val || "the specified value"}.`,
+      warning,
     };
   }
 

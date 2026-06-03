@@ -41,6 +41,7 @@ export default function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState("");
   const [showHelp, setShowHelp] = useState(false);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
@@ -79,12 +80,14 @@ export default function App() {
       return;
     }
     setError("");
+    setWarning("");
     setResult("");
 
     // try pattern match first — no API call needed for common formulas
     const matched = matchFormula(query, activeTab.grid, activeTab.headerRows);
     if (matched) {
       setResult(`Formula: ${matched.formula}\nExplanation: ${matched.explanation}`);
+      if (matched.warning) setWarning(matched.warning);
       return;
     }
 
@@ -165,6 +168,7 @@ export default function App() {
         />
 
         {error && <p className="error">{error}</p>}
+        {warning && <p className="warning">{warning}</p>}
 
         <FormulaOutput result={result} />
       </main>
