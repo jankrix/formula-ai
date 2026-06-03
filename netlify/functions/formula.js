@@ -16,17 +16,28 @@ export default async (req) => {
     return new Response("Missing required fields", { status: 400 });
   }
 
+  const isMultiSheet = tableData.includes("[") && tableData.match(/^\[.+\]/m);
+  const app = format === "excel" ? "Microsoft Excel" : "Google Sheets";
+  const sheetRefSyntax = format === "excel"
+    ? "SheetName!A:B (e.g. Sheet2!A:B)"
+    : "SheetName!A:B or 'Sheet Name'!A:B if the name has spaces";
+
   const systemPrompt = `You are a spreadsheet formula expert. The user will give you a table structure and ask a question.
-Your job is to return the exact formula they need for ${format === "excel" ? "Microsoft Excel" : "Google Sheets"}.
+Your job is to return the exact formula they need for ${app}.
 
 Rules:
 - Return ONLY the formula and a short explanation (2-3 sentences max)
-- Use ${format === "excel" ? "Excel" : "Google Sheets"} syntax specifically
-- If the formula differs between Excel and Google Sheets, use the correct one for ${format === "excel" ? "Excel" : "Google Sheets"}
-- Assume the data starts at row 2 (row 1 is headers) unless context suggests otherwise
+- Use ${app} syntax specifically
+- Assume data starts at row 2 (row 1 = headers) unless context suggests otherwise
 - Format your response as:
   Formula: <the formula>
-  Explanation: <brief explanation>`;
+  Explanation: <brief explanation>
+${isMultiSheet ? `
+Multi-sheet context:
+- The table data contains multiple sheets, each labeled like [Sheet1], [Sheet2], etc.
+- When the formula needs to reference another sheet, use the correct cross-sheet syntax: ${sheetRefSyntax}
+- Match sheet names exactly as provided in the labels
+` : ""}`;
 
   const userMessage = `Table structure:
 ${tableData}

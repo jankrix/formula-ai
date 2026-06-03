@@ -1,4 +1,5 @@
 import { useState } from "react";
+import TabBar from "./components/TabBar";
 import TableInput from "./components/TableInput";
 import QueryInput from "./components/QueryInput";
 import FormatToggle from "./components/FormatToggle";
@@ -7,8 +8,33 @@ import HelpPage from "./components/HelpPage";
 import StepHint from "./components/StepHint";
 import "./App.css";
 
+const INIT_ROWS = 6;
+const INIT_COLS = 5;
+
+function makeGrid() {
+  return Array.from({ length: INIT_ROWS }, () => Array(INIT_COLS).fill(""));
+}
+
+function makeTab(id, name) {
+  return { id, name, grid: makeGrid(), headerRows: 1 };
+}
+
+let tabCounter = 2;
+
+function buildTableData(tabs) {
+  const filledTabs = tabs.filter((t) => t.grid.some((r) => r.some((c) => c.trim())));
+  if (filledTabs.length === 0) return "";
+  if (filledTabs.length === 1) {
+    return filledTabs[0].grid.map((r) => r.join("\t")).join("\n");
+  }
+  return filledTabs
+    .map((t) => `[${t.name}]\n${t.grid.map((r) => r.join("\t")).join("\n")}`)
+    .join("\n\n");
+}
+
 export default function App() {
-  const [tableData, setTableData] = useState("");
+  const [tabs, setTabs] = useState([makeTab("sheet1", "Sheet1")]);
+  const [activeTabId, setActiveTabId] = useState("sheet1");
   const [query, setQuery] = useState("");
   const [format, setFormat] = useState("excel");
   const [result, setResult] = useState("");
@@ -16,9 +42,39 @@ export default function App() {
   const [error, setError] = useState("");
   const [showHelp, setShowHelp] = useState(false);
 
+  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const hasAnyData = tabs.some((t) => t.grid.some((r) => r.some((c) => c.trim())));
+
+  const updateActiveTab = (changes) => {
+    setTabs((prev) => prev.map((t) => t.id === activeTabId ? { ...t, ...changes } : t));
+  };
+
+  const handleAddTab = () => {
+    const id = `sheet${tabCounter++}`;
+    const name = `Sheet${tabs.length + 1}`;
+    const newTab = makeTab(id, name);
+    setTabs((prev) => [...prev, newTab]);
+    setActiveTabId(id);
+  };
+
+  const handleDeleteTab = (id) => {
+    const remaining = tabs.filter((t) => t.id !== id);
+    setTabs(remaining);
+    if (activeTabId === id) setActiveTabId(remaining[remaining.length - 1].id);
+  };
+
+  const handleRenameTab = (id, name) => {
+    setTabs((prev) => prev.map((t) => t.id === id ? { ...t, name } : t));
+  };
+
+  const handleClearTab = () => {
+    updateActiveTab({ grid: makeGrid(), headerRows: 1 });
+  };
+
   const handleGenerate = async () => {
+    const tableData = buildTableData(tabs);
     if (!tableData.trim() || !query.trim()) {
-      setError("Please paste your table and type your question.");
+      setError("Please fill in your table and type your question.");
       return;
     }
     setError("");
@@ -32,10 +88,7 @@ export default function App() {
         body: JSON.stringify({ tableData, query, format }),
       });
 
-      if (!res.ok) {
-        throw new Error("Something went wrong. Please try again.");
-      }
-
+      if (!res.ok) throw new Error("Something went wrong. Please try again.");
       const data = await res.json();
       setResult(data.result);
     } catch (err) {
@@ -62,8 +115,33 @@ export default function App() {
       </header>
 
       <main>
-        <StepHint visible={!tableData} />
-        <TableInput onChange={(data) => { setTableData(data); }} />
+        <StepHint visible={!hasAnyData} />
+
+        <div className="section">
+          <div className="sheet-header">
+            <TabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              onSwitch={setActiveTabId}
+              onAdd={handleAddTab}
+              onRename={handleRenameTab}
+              onDelete={handleDeleteTab}
+            />
+            {activeTab && activeTab.grid.some((r) => r.some((c) => c.trim())) && (
+              <button className="clear-btn" onClick={handleClearTab}>Clear sheet</button>
+            )}
+          </div>
+
+          {activeTab && (
+            <TableInput
+              key={activeTabId}
+              grid={activeTab.grid}
+              onGridChange={(grid) => updateActiveTab({ grid })}
+              headerRows={activeTab.headerRows}
+              onHeaderRowsChange={(headerRows) => updateActiveTab({ headerRows })}
+            />
+          )}
+        </div>
 
         <div className="section">
           <label>Formula type</label>
