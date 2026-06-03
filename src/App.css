@@ -348,3 +348,265 @@ footer {
 .table-preview thead .row-num {
   background: #f0f4ff !important;
 }
+
+/* ── Help link in header ── */
+.help-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 14px;
+  border: 1.5px solid #1a73e8;
+  border-radius: 20px;
+  background: transparent;
+  color: #1a73e8;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.help-link:hover {
+  background: #1a73e8;
+  color: #fff;
+}
+
+/* ── Help page ── */
+.help-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.help-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.help-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a73e8;
+  margin-bottom: 4px;
+}
+
+.help-header p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.help-close {
+  white-space: nowrap;
+  padding: 7px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #555;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.help-close:hover {
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.help-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e8e8e8;
+  margin-bottom: 28px;
+}
+
+.help-tabs button {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.help-tabs button:hover {
+  color: #333;
+}
+
+.help-tabs button.active {
+  color: #1a73e8;
+  border-bottom-color: #1a73e8;
+  font-weight: 600;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tab-intro {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-card {
+  display: flex;
+  gap: 16px;
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: #1a73e8;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.step-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.step-desc {
+  font-size: 0.88rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f5f5;
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: #333;
+}
+
+.tip-box {
+  background: #fffbe6;
+  border: 1.5px solid #ffe58f;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Examples */
+.example-block {
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.example-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+.example-note {
+  font-size: 0.82rem;
+  color: #f5a623;
+  background: #fff8ee;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.example-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.example-queries-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.example-queries {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.example-query {
+  display: flex;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #333;
+}
+
+.query-bullet {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+/* Apply */
+.apply-section-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1a73e8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: -8px;
+}
+
+.apply-step {
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.apply-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.apply-body {
+  font-size: 0.88rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.apply-body code {
+  background: #f0f4ff;
+  color: #1a73e8;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}

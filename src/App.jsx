@@ -3,6 +3,7 @@ import TableInput from "./components/TableInput";
 import QueryInput from "./components/QueryInput";
 import FormatToggle from "./components/FormatToggle";
 import FormulaOutput from "./components/FormulaOutput";
+import HelpPage from "./components/HelpPage";
 import "./App.css";
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showHelp, setShowHelp] = useState(false);
 
   const handleGenerate = async () => {
     if (!tableData.trim() || !query.trim()) {
@@ -42,11 +44,20 @@ export default function App() {
     }
   };
 
+  if (showHelp) {
+    return (
+      <div className="container">
+        <HelpPage onClose={() => setShowHelp(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <header>
         <h1>FormulaAI</h1>
         <p>Paste your table, ask a question, get the formula — no extensions, no data stored.</p>
+        <button className="help-link" onClick={() => setShowHelp(true)}>How to use?</button>
       </header>
 
       <main>
