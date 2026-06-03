@@ -81,29 +81,105 @@ function TabHowToUse() {
   );
 }
 
+function MultiSheetExample() {
+  return (
+    <div className="example-block">
+      <div className="example-title">Cross-sheet — VLOOKUP across two tabs</div>
+      <p className="example-note">Add a second tab with + Add sheet, paste each table into its own sheet, then ask your question.</p>
+
+      <div className="multisheet-demo">
+        <div className="multisheet-tab-bar">
+          <span className="multisheet-tab active-tab">Sheet1</span>
+          <span className="multisheet-tab">Sheet2</span>
+        </div>
+        <div className="multisheet-grids">
+          <div>
+            <div className="multisheet-label">Sheet1 — Main employee data</div>
+            <div className="example-table-wrap">
+              <table className="table-preview">
+                <thead><tr>{["Employee ID","Name","Department","Monthly Sales"].map((h,i)=><th key={i}>{h}</th>)}</tr></thead>
+                <tbody>
+                  {[["E001","Alice","Sales","85000"],["E002","Bob","Marketing","42000"],["E003","Carol","Sales","91000"]].map((r,i)=>(
+                    <tr key={i}>{r.map((c,j)=><td key={j}>{c}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div className="multisheet-label">Sheet2 — Commission rates</div>
+            <div className="example-table-wrap">
+              <table className="table-preview">
+                <thead><tr>{["Employee ID","Commission Rate","Bonus Cap"].map((h,i)=><th key={i}>{h}</th>)}</tr></thead>
+                <tbody>
+                  {[["E001","0.05","5000"],["E002","0.03","2000"],["E003","0.05","5000"]].map((r,i)=>(
+                    <tr key={i}>{r.map((c,j)=><td key={j}>{c}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="example-queries">
+        <div className="example-queries-label">Sample queries (with both sheets filled)</div>
+        {[
+          "Get the Commission Rate from Sheet2 for each employee based on Employee ID",
+          "Calculate commission: Monthly Sales multiplied by Commission Rate from Sheet2",
+          "Show Bonus Eligible if Monthly Sales exceeds Bonus Cap in Sheet2, else Not Eligible",
+          "Find employees whose Monthly Sales in Sheet1 exceed their Bonus Cap in Sheet2",
+        ].map((q, i) => (
+          <div key={i} className="example-query">
+            <span className="query-bullet">→</span>
+            <span>{q}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="formula-examples">
+        <div className="example-queries-label" style={{ marginTop: 12 }}>What FormulaAI returns</div>
+        {[
+          { q: "Get Commission Rate by Employee ID", f: "=VLOOKUP(A2,Sheet2!A:C,2,0)" },
+          { q: "Calculate commission amount", f: "=D2*VLOOKUP(A2,Sheet2!A:C,2,0)" },
+          { q: "Bonus eligible check", f: '=IF(D2>VLOOKUP(A2,Sheet2!A:C,3,0),"Bonus Eligible","Not Eligible")' },
+        ].map((item, i) => (
+          <div key={i} className="formula-example-row">
+            <span className="formula-example-q">{item.q}</span>
+            <code className="formula-example-f">{item.f}</code>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TabExamples() {
   return (
     <div className="tab-content">
       <ExampleBlock
-        title="Simple — Sales Table"
+        title="Simple — Instant formulas (no AI needed)"
+        note="These return instantly without an API call."
         table={{
-          headers: [["Name", "Region", "Department", "Sales", "Status"]],
+          headers: [["Name", "Department", "Monthly Sales", "Status"]],
           rows: [
-            ["Alice", "East", "Marketing", "5000", "Closed"],
-            ["Bob", "West", "Sales", "12000", "Closed"],
-            ["Carol", "East", "Sales", "8500", "Pending"],
+            ["Alice", "Sales", "85000", "Active"],
+            ["Bob", "Marketing", "42000", "Active"],
+            ["Carol", "Sales", "91000", "Inactive"],
           ],
         }}
         queries={[
-          "Sum of Sales where Region is East",
-          "Count rows where Status is Pending",
-          "Average sales for Department Sales",
-          "What percentage of total sales does East region contribute",
+          "total of Monthly Sales",
+          "sum of Monthly Sales where Department is Sales",
+          "count where Status is Active",
+          "average of Monthly Sales where Department is Marketing",
+          "highest Monthly Sales",
+          "lowest Monthly Sales",
         ]}
       />
 
       <ExampleBlock
-        title="Lookup — Employee Table"
+        title="Lookup — Single sheet"
         table={{
           headers: [["Employee ID", "Name", "Department", "Email", "Salary"]],
           rows: [
@@ -115,13 +191,16 @@ function TabExamples() {
         queries={[
           "Get the email of employee ID E002",
           "Find the salary of Carol",
-          "Which department does Alice belong to",
+          "If Salary is above 10000 show Senior else Junior",
+          "Rank employees by Salary highest to lowest",
         ]}
       />
 
+      <MultiSheetExample />
+
       <ExampleBlock
         title="Complex — Multi-header Quarterly Table"
-        note="Use 'Header rows: 2' toggle after pasting this table type."
+        note="Use 'Header rows: 2' toggle after pasting."
         table={{
           headers: [
             ["", "", "Q1", "", "Q2", ""],
@@ -135,9 +214,9 @@ function TabExamples() {
         }}
         queries={[
           "Total Q1 revenue for East region",
-          "Which department has the highest Q2 expense",
           "Total profit (revenue minus expense) per region across all quarters",
-          "Compare Q1 vs Q2 revenue growth percentage for Engineering",
+          "Which department has the highest Q2 expense",
+          "Compare Q1 vs Q4 revenue growth percentage for each department",
         ]}
       />
     </div>
@@ -180,8 +259,19 @@ function TabApply() {
         Google Sheets supports <code>ARRAYFORMULA</code> to apply a formula to a whole column at once without dragging. Ask FormulaAI: <em>"give me this as an ARRAYFORMULA"</em>.
       </ApplyStep>
 
+      <div className="apply-section-label" style={{ marginTop: 28 }}>Cross-sheet formulas</div>
+      <ApplyStep title="Match your sheet names exactly">
+        FormulaAI uses the tab names you set in the app (e.g. Sheet1, Sheet2). Make sure your actual Excel or Google Sheets tab names match — the formula will break if they differ. Rename tabs in FormulaAI by double-clicking the tab name.
+      </ApplyStep>
+      <ApplyStep title="Sheet name with spaces needs quotes">
+        If your sheet is named <code>Sales Data</code> (with a space), the reference becomes <code>'Sales Data'!A:C</code> with single quotes. FormulaAI handles this automatically for Google Sheets mode.
+      </ApplyStep>
+      <ApplyStep title="Lock the lookup range with $">
+        For VLOOKUP across sheets, lock the range so it doesn't shift when you drag the formula down: <code>=VLOOKUP(A2, Sheet2!$A:$C, 2, 0)</code>. Add <kbd>$</kbd> before the column letters in the range.
+      </ApplyStep>
+
       <div className="tip-box" style={{ marginTop: 24 }}>
-        <strong>Common issue:</strong> If the formula returns <code>#REF!</code> or <code>#VALUE!</code>, the column letters in the formula don't match your actual sheet. Ask FormulaAI again with the correct column layout described in your question.
+        <strong>Common issue:</strong> If the formula returns <code>#REF!</code> or <code>#N/A</code>, either the column letters don't match your sheet layout, or the lookup value in Sheet1 doesn't exist in Sheet2. Check that Employee IDs (or whatever you're matching on) are formatted the same way in both sheets — no extra spaces.
       </div>
     </div>
   );

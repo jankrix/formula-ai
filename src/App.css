@@ -949,6 +949,90 @@ kbd {
 }
 
 /* Apply */
+.multisheet-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.multisheet-tab-bar {
+  display: flex;
+  gap: 2px;
+  background: #f5f5f5;
+  padding: 8px 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.multisheet-tab {
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  border-radius: 5px 5px 0 0;
+  background: #e8e8e8;
+  color: #888;
+  border: 1px solid #ddd;
+  border-bottom: none;
+}
+
+.multisheet-tab.active-tab {
+  background: #fff;
+  color: #1a73e8;
+  font-weight: 600;
+  border-color: #1a73e8;
+}
+
+.multisheet-grids {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #ddd;
+  padding: 0;
+}
+
+.multisheet-grids > div {
+  background: #fff;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.multisheet-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #888;
+}
+
+.formula-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formula-example-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #f8faff;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.formula-example-q {
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.formula-example-f {
+  font-size: 0.85rem;
+  font-family: monospace;
+  color: #1a73e8;
+  background: none;
+  padding: 0;
+}
+
 .apply-section-label {
   font-weight: 700;
   font-size: 0.9rem;
