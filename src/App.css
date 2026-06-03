@@ -195,56 +195,53 @@ footer {
   color: #999;
 }
 
-.paste-textarea {
+/* Editable grid */
+.grid-editable {
+  min-width: 100%;
+}
+
+.grid-header-row {
+  background: #f0f4ff;
+}
+
+.grid-header-cell {
+  border: 1px solid #d0d7e8 !important;
+  background: #f0f4ff;
+}
+
+.grid-body-cell {
+  border: 1px solid #e8e8e8 !important;
+  padding: 0 !important;
+}
+
+.cell-input {
   width: 100%;
-  padding: 12px;
-  border: 1.5px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-family: monospace;
-  background: #fafafa;
-  color: #aaa;
-  cursor: text;
-  resize: none;
-  transition: border-color 0.15s;
-}
-.paste-textarea:focus {
+  min-width: 90px;
+  border: none;
   outline: none;
-  border-color: #1a73e8;
-  background: #fff;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  font-family: monospace;
+  background: transparent;
+  color: #1a1a1a;
 }
 
-/* Placeholder grid */
-.placeholder-grid {
-  opacity: 0.45;
-  pointer-events: none;
+.grid-header-cell .cell-input {
+  font-weight: 600;
+  color: #1a73e8;
 }
 
-.placeholder-cell {
-  height: 10px;
-  background: #d8e2f5;
-  border-radius: 3px;
-  width: 60px;
+.grid-body-cell:focus-within {
+  background: #f0f6ff;
+  border-color: #1a73e8 !important;
 }
 
-.placeholder-cell.header {
-  background: #a8bfe8;
-  width: 70px;
+.grid-editable tbody tr:hover td {
+  background: #fafcff;
 }
 
-@keyframes shimmer {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.4; }
-}
-
-.placeholder-grid .table-preview td,
-.placeholder-grid .table-preview th {
-  border-color: #e8eef8;
-}
-
-.placeholder-grid .table-preview thead tr {
-  background: #edf2fc;
+.grid-header-row:hover td {
+  background: #eaf0ff !important;
 }
 
 .table-label-row {

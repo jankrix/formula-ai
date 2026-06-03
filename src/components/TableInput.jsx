@@ -1,131 +1,110 @@
 import { useState, useCallback, useRef } from "react";
 
-const PLACEHOLDER_ROWS = 4;
-const PLACEHOLDER_COLS = 5;
+const INIT_ROWS = 6;
+const INIT_COLS = 5;
 
-function buildColspanCells(row) {
-  const result = [];
-  let i = 0;
-  while (i < row.length) {
-    const val = row[i];
-    if (val) {
-      let span = 1;
-      while (i + span < row.length && row[i + span] === "") span++;
-      result.push({ value: val, colspan: span });
-      i += span;
-    } else {
-      result.push({ value: "", colspan: 1 });
-      i++;
-    }
-  }
-  return result;
+function makeGrid(rows, cols) {
+  return Array.from({ length: rows }, () => Array(cols).fill(""));
 }
 
-function PlaceholderGrid() {
-  return (
-    <div className="table-preview-wrapper placeholder-grid">
-      <table className="table-preview">
-        <thead>
-          <tr>
-            <th className="row-num"></th>
-            {Array.from({ length: PLACEHOLDER_COLS }, (_, i) => (
-              <th key={i}><div className="placeholder-cell header" /></th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: PLACEHOLDER_ROWS }, (_, ri) => (
-            <tr key={ri}>
-              <td className="row-num">{ri + 2}</td>
-              {Array.from({ length: PLACEHOLDER_COLS }, (_, ci) => (
-                <td key={ci}><div className="placeholder-cell" style={{ width: `${50 + ((ri * 3 + ci * 7) % 40)}px` }} /></td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+function gridToTsv(grid) {
+  return grid.map((r) => r.join("\t")).join("\n");
 }
 
 export default function TableInput({ onChange }) {
-  const [cells, setCells] = useState([]);
-  const [origLengths, setOrigLengths] = useState([]);
-  const [hasData, setHasData] = useState(false);
-  const [pasteError, setPasteError] = useState("");
+  const [grid, setGrid] = useState(makeGrid(INIT_ROWS, INIT_COLS));
   const [headerRows, setHeaderRows] = useState(1);
-  const textareaRef = useRef(null);
+  const [pasteError, setPasteError] = useState("");
+  const tableRef = useRef(null);
 
-  const handlePaste = useCallback((e) => {
+  const hasData = grid.some((r) => r.some((c) => c.trim() !== ""));
+
+  const applyGrid = (newGrid) => {
+    setGrid(newGrid);
+    onChange(gridToTsv(newGrid));
+  };
+
+  const handleCellChange = (ri, ci, value) => {
+    const newGrid = grid.map((r) => [...r]);
+    newGrid[ri][ci] = value;
+    applyGrid(newGrid);
+  };
+
+  const handlePaste = useCallback((e, startRow = 0, startCol = 0) => {
     e.preventDefault();
     const raw = e.clipboardData.getData("text/plain");
-    const lines = raw.trim().split("\n");
 
     if (!raw.includes("\t")) {
-      setPasteError("Looks like plain text — please copy directly from Excel or Google Sheets and try again.");
+      setPasteError("Looks like plain text — please copy directly from Excel or Google Sheets.");
       return;
     }
 
     setPasteError("");
-    const rows = lines.map((r) => r.split("\t"));
-    const maxCols = Math.max(...rows.map((r) => r.length));
+    const rows = raw.trim().split("\n").map((r) => r.split("\t"));
+    const neededRows = startRow + rows.length;
+    const neededCols = startCol + Math.max(...rows.map((r) => r.length));
+    const newRows = Math.max(grid.length, neededRows);
+    const newCols = Math.max(grid[0].length, neededCols);
 
-    setOrigLengths(rows.map((r) => r.length));
+    const newGrid = Array.from({ length: newRows }, (_, ri) =>
+      Array.from({ length: newCols }, (_, ci) => grid[ri]?.[ci] ?? "")
+    );
 
-    const padded = rows.map((r) => {
-      const copy = [...r];
-      while (copy.length < maxCols) copy.push("");
-      return copy;
+    rows.forEach((row, ri) => {
+      row.forEach((val, ci) => {
+        newGrid[startRow + ri][startCol + ci] = val;
+      });
     });
 
-    setCells(padded);
-    setHasData(true);
-    onChange(padded.map((r) => r.join("\t")).join("\n"));
-  }, [onChange]);
+    applyGrid(newGrid);
+  }, [grid]);
 
-  const handleClear = () => {
-    setCells([]);
-    setOrigLengths([]);
-    setHasData(false);
-    setPasteError("");
-    setHeaderRows(1);
-    onChange("");
-    setTimeout(() => textareaRef.current?.focus(), 50);
+  const handleKeyDown = (e, ri, ci) => {
+    const rows = grid.length;
+    const cols = grid[0].length;
+
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const nextCi = e.shiftKey ? ci - 1 : ci + 1;
+      if (nextCi >= 0 && nextCi < cols) {
+        tableRef.current?.querySelector(`[data-cell="${ri}-${nextCi}"]`)?.focus();
+      } else if (!e.shiftKey && ri + 1 < rows) {
+        tableRef.current?.querySelector(`[data-cell="${ri + 1}-0"]`)?.focus();
+      }
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (ri + 1 < rows) {
+        tableRef.current?.querySelector(`[data-cell="${ri + 1}-${ci}"]`)?.focus();
+      }
+    }
+
+    if (e.key === "ArrowDown" && ri + 1 < rows) tableRef.current?.querySelector(`[data-cell="${ri + 1}-${ci}"]`)?.focus();
+    if (e.key === "ArrowUp" && ri > 0) tableRef.current?.querySelector(`[data-cell="${ri - 1}-${ci}"]`)?.focus();
+    if (e.key === "ArrowRight" && e.target.selectionStart === e.target.value.length && ci + 1 < cols) tableRef.current?.querySelector(`[data-cell="${ri}-${ci + 1}"]`)?.focus();
+    if (e.key === "ArrowLeft" && e.target.selectionStart === 0 && ci > 0) tableRef.current?.querySelector(`[data-cell="${ri}-${ci - 1}"]`)?.focus();
   };
 
-  function getDisplayRow(row, rowIndex) {
-    const deficit = (cells[0]?.length ?? 0) - (origLengths[rowIndex] ?? (cells[0]?.length ?? 0));
-    if (deficit <= 0) return row;
-    return [...Array(deficit).fill(""), ...row.slice(0, (cells[0]?.length ?? 0) - deficit)];
-  }
+  const handleClear = () => {
+    setGrid(makeGrid(INIT_ROWS, INIT_COLS));
+    setHeaderRows(1);
+    setPasteError("");
+    onChange("");
+    tableRef.current?.querySelector("[data-cell='0-0']")?.focus();
+  };
 
-  const colCount = cells[0]?.length ?? 0;
-  const headRows = cells.slice(0, headerRows);
-  const bodyRows = cells.slice(headerRows);
+  const cols = grid[0].length;
 
   return (
     <div className="section">
-      <label>Paste your table here</label>
-      <p className="hint">Copy headers + a few rows from Excel or Google Sheets, then paste below.</p>
-
-      <textarea
-        ref={textareaRef}
-        rows={4}
-        placeholder={"Name\tDepartment\tSales\nAlice\tMarketing\t5000\nBob\tSales\t8000"}
-        onPaste={handlePaste}
-        onChange={() => {}}
-        value=""
-        readOnly
-        className="paste-textarea"
-      />
-
-      {pasteError && <p className="error" style={{ marginTop: 6 }}>{pasteError}</p>}
-
-      {!hasData ? (
-        <PlaceholderGrid />
-      ) : (
-        <>
-          <div className="table-label-row">
+      <div className="table-label-row">
+        <div>
+          <label>Your table</label>
+          <p className="hint">Type directly or paste from Excel / Google Sheets.</p>
+        </div>
+        <div className="table-controls">
+          {hasData && (
             <div className="header-row-toggle">
               <span className="toggle-label">Header rows:</span>
               {[1, 2, 3, 4].map((n) => (
@@ -136,46 +115,42 @@ export default function TableInput({ onChange }) {
                 >{n}</button>
               ))}
             </div>
-            <button className="clear-btn" onClick={handleClear}>Clear &amp; re-paste</button>
-          </div>
-          <div className="table-preview-wrapper" onPaste={handlePaste}>
-            <table className="table-preview">
-              <thead>
-                {headRows.map((row, ri) => {
-                  const displayRow = getDisplayRow(row, ri);
-                  const cellDefs = headerRows > 1 && ri === 0
-                    ? buildColspanCells(displayRow)
-                    : displayRow.map((v) => ({ value: v, colspan: 1 }));
-                  return (
-                    <tr key={ri}>
-                      <th className="row-num"></th>
-                      {cellDefs.map((cell, ci) => (
-                        <th
-                          key={ci}
-                          colSpan={cell.colspan}
-                          style={{ textAlign: cell.colspan > 1 ? "center" : "left" }}
-                        >
-                          {cell.value}
-                        </th>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </thead>
-              <tbody>
-                {bodyRows.map((row, ri) => (
-                  <tr key={ri}>
-                    <td className="row-num">{ri + headerRows + 1}</td>
-                    {Array.from({ length: colCount }, (_, ci) => (
-                      <td key={ci}>{row[ci] ?? ""}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
+          )}
+          {hasData && (
+            <button className="clear-btn" onClick={handleClear}>Clear</button>
+          )}
+        </div>
+      </div>
+
+      {pasteError && <p className="error" style={{ marginTop: 4 }}>{pasteError}</p>}
+
+      <div className="table-preview-wrapper" ref={tableRef}>
+        <table className="table-preview grid-editable">
+          <tbody>
+            {grid.map((row, ri) => {
+              const isHeader = ri < headerRows && hasData;
+              return (
+                <tr key={ri} className={isHeader ? "grid-header-row" : ""}>
+                  <td className="row-num">{ri + 1}</td>
+                  {Array.from({ length: cols }, (_, ci) => (
+                    <td key={ci} className={isHeader ? "grid-header-cell" : "grid-body-cell"}>
+                      <input
+                        data-cell={`${ri}-${ci}`}
+                        value={row[ci] ?? ""}
+                        onChange={(e) => handleCellChange(ri, ci, e.target.value)}
+                        onPaste={(e) => handlePaste(e, ri, ci)}
+                        onKeyDown={(e) => handleKeyDown(e, ri, ci)}
+                        className="cell-input"
+                        spellCheck={false}
+                      />
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

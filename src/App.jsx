@@ -63,7 +63,7 @@ export default function App() {
 
       <main>
         <StepHint visible={!tableData} />
-        <TableInput onChange={setTableData} />
+        <TableInput onChange={(data) => { setTableData(data); }} />
 
         <div className="section">
           <label>Formula type</label>
