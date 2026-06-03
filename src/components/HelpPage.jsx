@@ -82,6 +82,20 @@ function TabHowToUse() {
 }
 
 function MultiSheetExample() {
+  const [activeSheet, setActiveSheet] = useState(0);
+
+  const sheet1 = {
+    label: "Sheet1 — Main employee data",
+    headers: ["Employee ID", "Name", "Department", "Monthly Sales"],
+    rows: [["E001","Alice","Sales","85000"],["E002","Bob","Marketing","42000"],["E003","Carol","Sales","91000"]],
+  };
+  const sheet2 = {
+    label: "Sheet2 — Commission rates",
+    headers: ["Employee ID", "Commission Rate", "Bonus Cap"],
+    rows: [["E001","0.05","5000"],["E002","0.03","2000"],["E003","0.05","5000"]],
+  };
+  const active = activeSheet === 0 ? sheet1 : sheet2;
+
   return (
     <div className="example-block">
       <div className="example-title">Cross-sheet — VLOOKUP across two tabs</div>
@@ -89,35 +103,21 @@ function MultiSheetExample() {
 
       <div className="multisheet-demo">
         <div className="multisheet-tab-bar">
-          <span className="multisheet-tab active-tab">Sheet1</span>
-          <span className="multisheet-tab">Sheet2</span>
+          {["Sheet1", "Sheet2"].map((name, i) => (
+            <button
+              key={i}
+              className={`multisheet-tab ${activeSheet === i ? "active-tab" : ""}`}
+              onClick={() => setActiveSheet(i)}
+            >{name}</button>
+          ))}
         </div>
-        <div className="multisheet-grids">
-          <div>
-            <div className="multisheet-label">Sheet1 — Main employee data</div>
-            <div className="example-table-wrap">
-              <table className="table-preview">
-                <thead><tr>{["Employee ID","Name","Department","Monthly Sales"].map((h,i)=><th key={i}>{h}</th>)}</tr></thead>
-                <tbody>
-                  {[["E001","Alice","Sales","85000"],["E002","Bob","Marketing","42000"],["E003","Carol","Sales","91000"]].map((r,i)=>(
-                    <tr key={i}>{r.map((c,j)=><td key={j}>{c}</td>)}</tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div>
-            <div className="multisheet-label">Sheet2 — Commission rates</div>
-            <div className="example-table-wrap">
-              <table className="table-preview">
-                <thead><tr>{["Employee ID","Commission Rate","Bonus Cap"].map((h,i)=><th key={i}>{h}</th>)}</tr></thead>
-                <tbody>
-                  {[["E001","0.05","5000"],["E002","0.03","2000"],["E003","0.05","5000"]].map((r,i)=>(
-                    <tr key={i}>{r.map((c,j)=><td key={j}>{c}</td>)}</tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        <div className="multisheet-grid-single">
+          <div className="multisheet-label">{active.label}</div>
+          <div className="example-table-wrap">
+            <table className="table-preview">
+              <thead><tr>{active.headers.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
+              <tbody>{active.rows.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>)}</tbody>
+            </table>
           </div>
         </div>
       </div>

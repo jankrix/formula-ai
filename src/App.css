@@ -983,20 +983,24 @@ kbd {
   border-color: #1a73e8;
 }
 
-.multisheet-grids {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: #ddd;
-  padding: 0;
-}
-
-.multisheet-grids > div {
-  background: #fff;
+.multisheet-grid-single {
   padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: #fff;
+}
+
+.multisheet-tab {
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  border-radius: 5px 5px 0 0;
+  background: #e8e8e8;
+  color: #888;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
 .multisheet-label {
