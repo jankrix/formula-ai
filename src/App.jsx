@@ -4,6 +4,7 @@ import QueryInput from "./components/QueryInput";
 import FormatToggle from "./components/FormatToggle";
 import FormulaOutput from "./components/FormulaOutput";
 import HelpPage from "./components/HelpPage";
+import StepHint from "./components/StepHint";
 import "./App.css";
 
 export default function App() {
@@ -61,6 +62,7 @@ export default function App() {
       </header>
 
       <main>
+        <StepHint visible={!tableData} />
         <TableInput onChange={setTableData} />
 
         <div className="section">
