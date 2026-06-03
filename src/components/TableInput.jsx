@@ -1,4 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
+
+const PLACEHOLDER_ROWS = 4;
+const PLACEHOLDER_COLS = 5;
 
 function buildColspanCells(row) {
   const result = [];
@@ -18,12 +21,40 @@ function buildColspanCells(row) {
   return result;
 }
 
+function PlaceholderGrid() {
+  return (
+    <div className="table-preview-wrapper placeholder-grid">
+      <table className="table-preview">
+        <thead>
+          <tr>
+            <th className="row-num"></th>
+            {Array.from({ length: PLACEHOLDER_COLS }, (_, i) => (
+              <th key={i}><div className="placeholder-cell header" /></th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: PLACEHOLDER_ROWS }, (_, ri) => (
+            <tr key={ri}>
+              <td className="row-num">{ri + 2}</td>
+              {Array.from({ length: PLACEHOLDER_COLS }, (_, ci) => (
+                <td key={ci}><div className="placeholder-cell" style={{ width: `${50 + ((ri * 3 + ci * 7) % 40)}px` }} /></td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function TableInput({ onChange }) {
   const [cells, setCells] = useState([]);
   const [origLengths, setOrigLengths] = useState([]);
   const [hasData, setHasData] = useState(false);
   const [pasteError, setPasteError] = useState("");
   const [headerRows, setHeaderRows] = useState(1);
+  const textareaRef = useRef(null);
 
   const handlePaste = useCallback((e) => {
     e.preventDefault();
@@ -59,86 +90,92 @@ export default function TableInput({ onChange }) {
     setPasteError("");
     setHeaderRows(1);
     onChange("");
+    setTimeout(() => textareaRef.current?.focus(), 50);
   };
 
-  if (!hasData) {
-    return (
-      <div className="section">
-        <label>Paste your table</label>
-        <p className="hint">Copy from Excel or Google Sheets, click the area below, then press Cmd+V / Ctrl+V.</p>
-        <div className="paste-zone" tabIndex={0} onPaste={handlePaste}>
-          <div className="paste-zone-icon">⌘V</div>
-          <div className="paste-zone-text">Click here and paste your table</div>
-          <div className="paste-zone-sub">Works with Excel and Google Sheets</div>
-        </div>
-        {pasteError && <p className="error" style={{ marginTop: 8 }}>{pasteError}</p>}
-      </div>
-    );
-  }
-
-  const colCount = cells[0].length;
-
-  // for each header row, right-shift if its original length was less than maxCols
-  // (caused by merged empty cells that Google Sheets compresses to 1 tab)
   function getDisplayRow(row, rowIndex) {
-    const deficit = colCount - (origLengths[rowIndex] ?? colCount);
+    const deficit = (cells[0]?.length ?? 0) - (origLengths[rowIndex] ?? (cells[0]?.length ?? 0));
     if (deficit <= 0) return row;
-    const shifted = [...Array(deficit).fill(""), ...row.slice(0, colCount - deficit)];
-    return shifted;
+    return [...Array(deficit).fill(""), ...row.slice(0, (cells[0]?.length ?? 0) - deficit)];
   }
 
+  const colCount = cells[0]?.length ?? 0;
   const headRows = cells.slice(0, headerRows);
   const bodyRows = cells.slice(headerRows);
 
   return (
     <div className="section">
-      <div className="table-label-row">
-        <label>Your table</label>
-        <div className="table-controls">
-          <div className="header-row-toggle">
-            <span className="toggle-label">Header rows:</span>
-            <button className={headerRows === 1 ? "active" : ""} onClick={() => setHeaderRows(1)}>1</button>
-            <button className={headerRows === 2 ? "active" : ""} onClick={() => setHeaderRows(2)}>2</button>
+      <label>Paste your table here</label>
+      <p className="hint">Copy headers + a few rows from Excel or Google Sheets, then paste below.</p>
+
+      <textarea
+        ref={textareaRef}
+        rows={4}
+        placeholder={"Name\tDepartment\tSales\nAlice\tMarketing\t5000\nBob\tSales\t8000"}
+        onPaste={handlePaste}
+        onChange={() => {}}
+        value=""
+        readOnly
+        className="paste-textarea"
+      />
+
+      {pasteError && <p className="error" style={{ marginTop: 6 }}>{pasteError}</p>}
+
+      {!hasData ? (
+        <PlaceholderGrid />
+      ) : (
+        <>
+          <div className="table-label-row">
+            <div className="header-row-toggle">
+              <span className="toggle-label">Header rows:</span>
+              {[1, 2, 3, 4].map((n) => (
+                <button
+                  key={n}
+                  className={headerRows === n ? "active" : ""}
+                  onClick={() => setHeaderRows(n)}
+                >{n}</button>
+              ))}
+            </div>
+            <button className="clear-btn" onClick={handleClear}>Clear &amp; re-paste</button>
           </div>
-          <button className="clear-btn" onClick={handleClear}>Clear &amp; re-paste</button>
-        </div>
-      </div>
-      <div className="table-preview-wrapper" onPaste={handlePaste}>
-        <table className="table-preview">
-          <thead>
-            {headRows.map((row, ri) => {
-              const displayRow = getDisplayRow(row, ri);
-              const cellDefs = headerRows === 2 && ri === 0
-                ? buildColspanCells(displayRow)
-                : displayRow.map((v) => ({ value: v, colspan: 1 }));
-              return (
-                <tr key={ri}>
-                  <th className="row-num"></th>
-                  {cellDefs.map((cell, ci) => (
-                    <th
-                      key={ci}
-                      colSpan={cell.colspan}
-                      style={{ textAlign: cell.colspan > 1 ? "center" : "left" }}
-                    >
-                      {cell.value}
-                    </th>
-                  ))}
-                </tr>
-              );
-            })}
-          </thead>
-          <tbody>
-            {bodyRows.map((row, ri) => (
-              <tr key={ri}>
-                <td className="row-num">{ri + headerRows + 1}</td>
-                {Array.from({ length: colCount }, (_, ci) => (
-                  <td key={ci}>{row[ci] ?? ""}</td>
+          <div className="table-preview-wrapper" onPaste={handlePaste}>
+            <table className="table-preview">
+              <thead>
+                {headRows.map((row, ri) => {
+                  const displayRow = getDisplayRow(row, ri);
+                  const cellDefs = headerRows > 1 && ri === 0
+                    ? buildColspanCells(displayRow)
+                    : displayRow.map((v) => ({ value: v, colspan: 1 }));
+                  return (
+                    <tr key={ri}>
+                      <th className="row-num"></th>
+                      {cellDefs.map((cell, ci) => (
+                        <th
+                          key={ci}
+                          colSpan={cell.colspan}
+                          style={{ textAlign: cell.colspan > 1 ? "center" : "left" }}
+                        >
+                          {cell.value}
+                        </th>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </thead>
+              <tbody>
+                {bodyRows.map((row, ri) => (
+                  <tr key={ri}>
+                    <td className="row-num">{ri + headerRows + 1}</td>
+                    {Array.from({ length: colCount }, (_, ci) => (
+                      <td key={ci}>{row[ci] ?? ""}</td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }
