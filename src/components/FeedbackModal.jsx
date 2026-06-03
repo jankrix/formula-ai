@@ -14,9 +14,8 @@ export default function FeedbackModal({ onClose }) {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    fetch("https://script.google.com/macros/s/AKfycbzOojFW7wT9DvUQ_wEpI20G2oBmSeJv_UDci5_C97uMLAfod4bqJ8fi8LupsURRwf0T/exec", {
+    fetch("/api/feedback", {
       method: "POST",
-      mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rating, plan, comment }),
     });
