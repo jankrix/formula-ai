@@ -7,6 +7,16 @@ function makeGrid(rows, cols) {
   return Array.from({ length: rows }, () => Array(cols).fill(""));
 }
 
+function colLabel(i) {
+  let label = "";
+  i += 1;
+  while (i > 0) {
+    label = String.fromCharCode(((i - 1) % 26) + 65) + label;
+    i = Math.floor((i - 1) / 26);
+  }
+  return label;
+}
+
 function gridToTsv(grid) {
   return grid.map((r) => r.join("\t")).join("\n");
 }
@@ -126,6 +136,14 @@ export default function TableInput({ onChange }) {
 
       <div className="table-preview-wrapper" ref={tableRef}>
         <table className="table-preview grid-editable">
+          <thead>
+            <tr>
+              <th className="row-num"></th>
+              {Array.from({ length: cols }, (_, ci) => (
+                <th key={ci} className="col-label">{colLabel(ci)}</th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
             {grid.map((row, ri) => {
               const isHeader = ri < headerRows && hasData;
