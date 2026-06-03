@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { matchFormula } from "./utils/formulaMatcher";
 import TabBar from "./components/TabBar";
 import TableInput from "./components/TableInput";
 import QueryInput from "./components/QueryInput";
@@ -78,8 +79,16 @@ export default function App() {
       return;
     }
     setError("");
-    setLoading(true);
     setResult("");
+
+    // try pattern match first — no API call needed for common formulas
+    const matched = matchFormula(query, activeTab.grid, activeTab.headerRows);
+    if (matched) {
+      setResult(`Formula: ${matched.formula}\nExplanation: ${matched.explanation}`);
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/formula", {
