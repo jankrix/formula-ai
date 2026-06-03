@@ -53,26 +53,29 @@ function ExampleBlock({ title, table, queries, note }) {
 function TabHowToUse() {
   return (
     <div className="tab-content">
-      <p className="tab-intro">FormulaAI turns plain-language questions about your spreadsheet into ready-to-use formulas — without sharing your full data.</p>
+      <p className="tab-intro">FormulaAI turns plain-language questions about your spreadsheet into ready-to-use formulas — no extensions, no data stored.</p>
       <div className="steps">
-        <StepCard number="1" title="Copy from Excel or Google Sheets">
-          Select your headers and a few rows of data. Press <kbd>Cmd+C</kbd> (Mac) or <kbd>Ctrl+C</kbd> (Windows). You don't need to copy the whole sheet — just enough rows for the AI to understand the structure.
+        <StepCard number="1" title="Enter your table">
+          You can type directly into the spreadsheet grid, or copy from Excel / Google Sheets and paste with <kbd>Cmd+V</kbd> (Mac) or <kbd>Ctrl+V</kbd> (Windows). The grid fills instantly. You don't need the full sheet — headers and a few rows is enough.
         </StepCard>
-        <StepCard number="2" title="Paste into the table zone">
-          Click the dashed paste area on the main page, then press <kbd>Cmd+V</kbd> / <kbd>Ctrl+V</kbd>. Your table will appear as a grid instantly. If your table has two header rows (group labels + column names), toggle <strong>Header rows: 2</strong>.
+        <StepCard number="2" title="Set header rows if needed">
+          If your table has group headers above column names (e.g. Q1 / Q2 spanning Revenue and Expense), use the <strong>Header rows: 1 / 2 / 3 / 4</strong> toggle to mark them. This helps the formula reference the right columns.
         </StepCard>
-        <StepCard number="3" title="Choose Excel or Google Sheets">
-          Use the toggle to select which app you're working in. The formula syntax differs between the two — XLOOKUP exists in Excel but not older Sheets, FILTER is Sheets-native, etc.
+        <StepCard number="3" title="Add more sheets for cross-sheet formulas">
+          Click <strong>+ Add sheet</strong> to add a second tab and paste a lookup table there. FormulaAI will generate formulas that reference across sheets (e.g. <code>VLOOKUP(A2, Sheet2!A:C, 3, 0)</code>). Double-click a tab name to rename it.
         </StepCard>
-        <StepCard number="4" title="Ask your question in plain English">
-          Type what you want to calculate. Be specific about column names and conditions. Press <kbd>Enter</kbd> or click <strong>Generate</strong>.
+        <StepCard number="4" title="Choose Excel or Google Sheets">
+          Use the toggle to select your app. Syntax differs — XLOOKUP works in Excel but not older Sheets, FILTER and ARRAYFORMULA are Sheets-native.
         </StepCard>
-        <StepCard number="5" title="Copy and paste the formula">
-          Click <strong>Copy</strong> next to the result, go to your spreadsheet, click the cell where you want the formula, and paste. Adjust cell references if needed.
+        <StepCard number="5" title="Ask your question in plain English">
+          Type what you want. Be specific about column names and conditions — e.g. <em>"sum of Monthly Sales where Department is Sales"</em>. Press <kbd>Enter</kbd> or click <strong>Generate</strong>. Common formulas (SUM, SUMIF, COUNT, AVERAGE, MAX, MIN) return instantly without waiting for AI.
+        </StepCard>
+        <StepCard number="6" title="Copy and use the formula">
+          Click <strong>Copy</strong> next to the result, go to your spreadsheet, click the target cell, and paste. The formula explanation tells you exactly which column each reference maps to.
         </StepCard>
       </div>
       <div className="tip-box">
-        <strong>Privacy note:</strong> Only your question and table structure are sent to the AI. Your actual data values are included only as sample rows — we never store anything.
+        <strong>Privacy note:</strong> Only your question and table structure are sent for formula generation. We never store your data.
       </div>
     </div>
   );

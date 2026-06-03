@@ -12,13 +12,18 @@ export default function QueryInput({ value, onChange, onSubmit, loading }) {
       <div className="query-row">
         <textarea
           rows={2}
-          placeholder="e.g. Sum of Sales where Department is Sales"
+          placeholder="e.g. Sum of Monthly Sales where Department is Sales"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKey}
         />
-        <button onClick={onSubmit} disabled={loading}>
-          {loading ? "..." : "Generate"}
+        <button onClick={onSubmit} disabled={loading} className={loading ? "btn-loading" : ""}>
+          {loading ? (
+            <span className="spinner-row">
+              <span className="spinner" />
+              Generating
+            </span>
+          ) : "Generate"}
         </button>
       </div>
     </div>
