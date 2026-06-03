@@ -11,7 +11,8 @@
       "Bash(git push *)",
       "mcp__news-search__tavily_search",
       "mcp__stockbit__stockbit_screener_foreign_flow",
-      "mcp__tradingview__quote_get"
+      "mcp__tradingview__quote_get",
+      "Bash(curl *)"
     ]
   }
 }

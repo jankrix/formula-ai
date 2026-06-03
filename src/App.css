@@ -444,44 +444,31 @@ footer {
 .rating-btn.selected-yes { border-color: #34a853; background: #f0faf4; color: #34a853; font-weight: 600; }
 .rating-btn.selected-no { border-color: #ea4335; background: #fdf0ef; color: #ea4335; font-weight: 600; }
 
-.plan-row {
+
+.usecase-row {
   display: flex;
   gap: 8px;
 }
 
-.plan-btn {
+.usecase-btn {
   flex: 1;
-  padding: 12px 8px;
+  padding: 10px 6px;
   border: 1.5px solid #ddd;
   border-radius: 10px;
   background: #fff;
   cursor: pointer;
-  text-align: center;
-  transition: all 0.15s;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
 }
-.plan-btn:hover { border-color: #1a73e8; }
-.plan-btn.selected-plan { border-color: #1a73e8; background: #f0f4ff; }
+.usecase-btn:hover { border-color: #1a73e8; }
+.usecase-btn.selected-usecase { border-color: #1a73e8; background: #f0f4ff; }
 
-.plan-price {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1a73e8;
-}
-.plan-btn.selected-plan .plan-price { color: #1a73e8; }
-
-.plan-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.plan-desc {
-  font-size: 0.72rem;
-  color: #999;
-}
+.usecase-icon { font-size: 1.3rem; }
+.usecase-label { font-size: 0.78rem; font-weight: 600; color: #333; }
+.usecase-btn.selected-usecase .usecase-label { color: #1a73e8; }
 
 .modal-textarea {
   width: 100%;

@@ -1,14 +1,15 @@
 import { useState } from "react";
 
-const PLANS = [
-  { id: "free", label: "Free", desc: "Limited requests/day", price: "$0" },
-  { id: "pro", label: "Pro", desc: "Unlimited requests", price: "$7/mo" },
-  { id: "power", label: "Power", desc: "Priority + history", price: "$12/mo" },
+const USE_CASES = [
+  { id: "work", label: "Work", icon: "💼" },
+  { id: "school", label: "School", icon: "📚" },
+  { id: "personal", label: "Personal", icon: "🏠" },
+  { id: "freelance", label: "Freelance", icon: "💻" },
 ];
 
 export default function FeedbackModal({ onClose }) {
   const [rating, setRating] = useState(null);
-  const [plan, setPlan] = useState(null);
+  const [useCase, setUseCase] = useState(null);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -17,7 +18,7 @@ export default function FeedbackModal({ onClose }) {
     fetch("/api/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rating, plan, comment }),
+      body: JSON.stringify({ rating, useCase, comment }),
     });
   };
 
@@ -57,17 +58,16 @@ export default function FeedbackModal({ onClose }) {
             </div>
 
             <div className="modal-section">
-              <div className="modal-label">Which plan would you choose?</div>
-              <div className="plan-row">
-                {PLANS.map((p) => (
+              <div className="modal-label">What's your main use case?</div>
+              <div className="usecase-row">
+                {USE_CASES.map((u) => (
                   <button
-                    key={p.id}
-                    className={`plan-btn ${plan === p.id ? "selected-plan" : ""}`}
-                    onClick={() => setPlan(p.id)}
+                    key={u.id}
+                    className={`usecase-btn ${useCase === u.id ? "selected-usecase" : ""}`}
+                    onClick={() => setUseCase(u.id)}
                   >
-                    <div className="plan-price">{p.price}</div>
-                    <div className="plan-name">{p.label}</div>
-                    <div className="plan-desc">{p.desc}</div>
+                    <span className="usecase-icon">{u.icon}</span>
+                    <span className="usecase-label">{u.label}</span>
                   </button>
                 ))}
               </div>
@@ -89,7 +89,7 @@ export default function FeedbackModal({ onClose }) {
               <button
                 className="modal-submit"
                 onClick={handleSubmit}
-                disabled={!rating && !plan && !comment}
+                disabled={!rating && !useCase && !comment}
               >
                 Submit
               </button>
