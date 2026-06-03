@@ -19,7 +19,7 @@ function colLetter(i) {
 
 function findCols(q, headers) {
   return headers
-    .map((h, i) => ({ name: h, letter: colLetter(i), pos: q.toLowerCase().indexOf(h.toLowerCase()) }))
+    .map((h, i) => ({ name: h, letter: colLetter(i), index: i, pos: q.toLowerCase().indexOf(h.toLowerCase()) }))
     .filter((c) => c.name.trim() && c.pos >= 0)
     .sort((a, b) => a.pos - b.pos);
 }
@@ -61,6 +61,7 @@ export function matchFormula(query, grid, headerRows) {
   if (!headers.some(Boolean)) return null;
 
   const q = " " + query.toLowerCase() + " ";
+  const qOriginal = " " + query + " ";
   const cols = findCols(q, headers);
   const hasCond = has(q, COND_KW);
   const ckp = condKeyPos(q);
@@ -80,7 +81,7 @@ export function matchFormula(query, grid, headerRows) {
   if (has(q, SUM_KW) && hasCond && cols.length >= 2) {
     const sumCol = cols.find((c) => c.pos < ckp) || cols[0];
     const condCol = cols.find((c) => c !== sumCol) || cols[1];
-    const val = extractValue(q);
+    const val = extractValue(qOriginal);
     const criteria = val ? `"${val}"` : `""`;
     const warning = validateValue(val, grid, condCol.index, headerRows);
     return {
@@ -102,7 +103,7 @@ export function matchFormula(query, grid, headerRows) {
   // ── COUNTIF ─────────────────────────────────────────
   if (has(q, COUNT_KW) && hasCond && cols.length >= 1) {
     const condCol = cols.find((c) => c.pos > ckp) || cols[0];
-    const val = extractValue(q);
+    const val = extractValue(qOriginal);
     const criteria = val ? `"${val}"` : `""`;
     const warning = validateValue(val, grid, condCol.index, headerRows);
     return {
@@ -125,7 +126,7 @@ export function matchFormula(query, grid, headerRows) {
   if (has(q, AVG_KW) && hasCond && cols.length >= 2) {
     const avgCol = cols.find((c) => c.pos < ckp) || cols[0];
     const condCol = cols.find((c) => c !== avgCol) || cols[1];
-    const val = extractValue(q);
+    const val = extractValue(qOriginal);
     const criteria = val ? `"${val}"` : `""`;
     const warning = validateValue(val, grid, condCol.index, headerRows);
     return {
