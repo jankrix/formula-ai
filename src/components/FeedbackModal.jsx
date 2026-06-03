@@ -13,16 +13,13 @@ export default function FeedbackModal({ onClose }) {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = () => {
-    const entry = {
-      rating,
-      plan,
-      comment,
-      ts: new Date().toISOString(),
-    };
-    // store locally for now — swap for an API call later
-    const existing = JSON.parse(localStorage.getItem("formulaai_feedback") || "[]");
-    localStorage.setItem("formulaai_feedback", JSON.stringify([...existing, entry]));
     setSubmitted(true);
+    fetch("https://script.google.com/macros/s/AKfycbzOojFW7wT9DvUQ_wEpI20G2oBmSeJv_UDci5_C97uMLAfod4bqJ8fi8LupsURRwf0T/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating, plan, comment }),
+    });
   };
 
   return (
